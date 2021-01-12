@@ -5,7 +5,7 @@ from socket import*
 from datetime import datetime
 import time
 
-serverName='127.0.0.1'
+serverName = '127.0.0.1'
 serverPort = 12000
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
@@ -31,21 +31,17 @@ for message in test_pings:
         initial_time = time.time()
         modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
         ending_time = time.time()
-
-
         now = datetime.now()
         elapsed_time = str(ending_time - initial_time)
-        #current_time = now.strftime("%H:%M:%S")
+
         print(modifiedMessage.decode(),
-              now.strftime("%a"),   #Formatting the time for month short version
-              now.strftime("%b"),   #Formatting for date
+              now.strftime("%a"),   # Formatting the time for month short version
+              now.strftime("%b"),   # Formatting for date
               now.strftime("%d"),
               now.strftime("%X"),
               now.strftime("%G"))
         print("RTT: ", elapsed_time)
     except timeout:
         print('Request Timed Out.')
-
-
 
 clientSocket.close()
