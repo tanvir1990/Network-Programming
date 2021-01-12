@@ -37,8 +37,8 @@ for message in test_pings:
         elapsed_time = str(ending_time - initial_time)
         #current_time = now.strftime("%H:%M:%S")
         print(modifiedMessage.decode(),
-              now.strftime("%a"),
-              now.strftime("%b"),
+              now.strftime("%a"),   #Formatting the time for month short version
+              now.strftime("%b"),   #Formatting for date
               now.strftime("%d"),
               now.strftime("%X"),
               now.strftime("%G"))
