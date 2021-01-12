@@ -1,1 +1,4 @@
-
+*.iml
+*.pdf
+*.xml
+*\*\.idea
