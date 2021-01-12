@@ -11,7 +11,8 @@ serverPort = 12000
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 clientSocket.connect((serverName, serverPort))
 clientSocket.settimeout(1)
-#print("Input Lowercase Sentence: ")
+
+# Creating 10 Ping Messages
 test_pings = ['ping 1',
               'ping 2',
               'ping 3',
