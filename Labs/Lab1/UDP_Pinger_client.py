@@ -19,8 +19,8 @@ socket_client.settimeout(1)                                                # Con
 for ping_seq in range(1, 11):
     try:
         message = 'ping'                                             # Original message in lower case
-        socket_client.sendto(message.encode(), (server_name, server_port))
         init_time = time.time()                                      # Taking the initial time stamp
+        socket_client.sendto(message.encode(), (server_name, server_port))
         received_message, server_address = socket_client.recvfrom(2048)
         end_time = time.time()                                       # Taking the End time stamp
         current_date_time = datetime.now()                           # Taking the current date and time
