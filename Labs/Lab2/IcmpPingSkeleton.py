@@ -1,3 +1,7 @@
+# SSYC 4502
+# Name: Tanvir Hossain
+# Id: 101058988
+
 from socket import *
 import os
 import sys
@@ -34,7 +38,8 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
 		#Fill in start
 		#Fetch the ICMP header from the IP packet, extract relevant fields and generate output
 		ipHeader = recPacket[:20]
-		ipVer, servType, length, ipID, ipFlagsOff, ipTTL, ipProc, ipChecksum, ipSrc, ipDest = struct.unpack("BBHHHBBHII", ipHeader)
+		ipVer, servType, length, ipID, ipFlagsOff, ipTTL, ipProc,\
+		ipChecksum, ipSrc, ipDest = struct.unpack("BBHHHBBHII", ipHeader)
 
 		icmpHeader = recPacket[20:28]
 		icmpType, code, checksum, packID, sequence = struct.unpack("bbHHh", icmpHeader)
@@ -42,15 +47,16 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
 			timeSent = struct.unpack("d", recPacket[28:28 + struct.calcsize("d")])[0]
 
 			# Print out reply information
-			delayMS = (timeReceived - timeSent) * 1000
+			delay = (timeReceived - timeSent) * 1000
 			packetSize = len(recPacket)
 
-			print ("Reply from " + str(addr[0]) + ": bytes=" + str(packetSize) + " time=" + str(delayMS) + "ms TTL=" + str(ipTTL))
+			print ("Reply from " +
+				str(addr[0]) + ": bytes=" + str(packetSize) +
+				" time=" + str(delay) + "ms TTL=" + str(ipTTL))
 
-			return delayMS
+			return delay
 
-		#Fill in end 
-		
+		# Fill in end 
 		timeLeft = timeLeft - howLongInSelect
 		if timeLeft <= 0:
 			return "Request timed out."
