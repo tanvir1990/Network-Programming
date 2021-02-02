@@ -61,23 +61,28 @@ def delete_a_reservation(message_from_client, address):
 			isRoomValid(message_from_client, address) is False):
 		print("Invalid input for either day, time or room. \n Look at messages at client side")
 	else:
-		with open("reservations.txt", "r") as f:
-			lines = f.readlines()
-		with open("reservations.txt", "w") as f:
-			for line in lines:
-				if line.strip("\n") != delete_line:
-					f.write(line)
+		if reservation_exists_for(delete_line):
+			with open("reservations.txt", "r") as f:
+				lines = f.readlines()
+			with open("reservations.txt", "w") as f:
+				for line in lines:
+					if line.strip("\n") != delete_line:
+						f.write(line)
 
-		message_to_client = " Deleted the reservation for " + delete_line
-		send_message_to_client(message_to_client, address)
+			message_to_client = " Deleted the reservation for " + delete_line
+			send_message_to_client(message_to_client, address)
+		else:
+			message_to_client = " Reservation Does not exist for " + delete_line
+			send_message_to_client(message_to_client, address)
 
-# def reservation_exists(message):
-# 	file = open("reservations.txt", "r+")
-# 	lines = file.readlines()
-# 	for line in lines:
-# 		if message.strip() == line.strip():
-# 			return True
-# 			break
+def reservation_exists_for(message):
+	file = open("reservations.txt", "r+")
+	lines = file.readlines()
+	for line in lines:
+		if message.strip() == line.strip():
+			return True
+			break
+	file.close()
 
 def addReservation(message_from_client, address):
 	if (isTimeSlotsValid(message_from_client, address) is False or
@@ -93,21 +98,16 @@ def addReservation(message_from_client, address):
 		day = message.split(' ')[3]
 
 		reserve_information_from_client = room_number + ' ' + timeSlot + ' ' + day
-		file = open("reservations.txt", "r+")
-		lines = file.readlines()
-		# Check if the reservation already exists
-		for line in lines:
-			if reserve_information_from_client.strip() == line.strip():
-				reservation_exists = True
-				break
-		if reservation_exists == True:
+
+		if reservation_exists_for(reserve_information_from_client):
 			message_to_client = "Error: Reservation already Exists"
 			send_message_to_client(message_to_client, address)
 		else:
+			file = open("reservations.txt", "r+")
 			file.write(reserve_information_from_client + "\n")
 			message_to_client = " Reservation Successful!"
 			send_message_to_client(message_to_client, address)
-		file.close()
+			file.close()
 
 
 
