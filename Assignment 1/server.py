@@ -42,9 +42,10 @@ def getTime():
 
 def check_reservation(room_number):
 	file_reservation = open("reservations.txt", 'r')
+	lines = file_reservation.readlines()
 	dict_reservation = []
-	for lines in file_reservation:
-		if lines.split()[0] == room_number:
+	for lines in lines:
+		if lines.split(' ')[0] == room_number:
 			dict_reservation.append(lines.strip())
 	file_reservation.close()
 	return dict_reservation
@@ -103,7 +104,7 @@ def addReservation(message_from_client, address):
 			message_to_client = "Error: Reservation already Exists"
 			send_message_to_client(message_to_client, address)
 		else:
-			file = open("reservations.txt", "r+")
+			file = open("reservations.txt", "a+")
 			file.write(reserve_information_from_client + "\n")
 			message_to_client = " Reservation Successful!"
 			send_message_to_client(message_to_client, address)

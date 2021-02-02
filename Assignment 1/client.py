@@ -7,11 +7,11 @@ import sys
 import pickle
 
 # Taking the arguments from Command line input
-# server_name = str(sys.argv[1])
-# server_port = int(sys.argv[2])
+server_name = str(sys.argv[1])
+server_port = int(sys.argv[2])
 
-server_name = "127.0.0.1"
-server_port = 12000
+# server_name = "127.0.0.1"
+# server_port = 12000
 
 # Create socket Server
 socket_client = socket(AF_INET, SOCK_DGRAM)
