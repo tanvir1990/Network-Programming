@@ -21,12 +21,6 @@ for ping_seq in range(1, 2):
 
     while 1:
         message = input("Input your command: \n")
-        #message = 'days'
-        #message = 'rooms'
-        #message = 'check'
-        #message = 'timeslots
-        #message = 'reserve GE125 9:30-10:30 Tuesday'
-        #message = 'delete GE125 9:30-10:30 Tuesday'
 
         if message == 'quit':
             try:
