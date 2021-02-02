@@ -162,7 +162,11 @@ while True:
 	elif message_from_client.decode().split(' ')[0] == 'check':
 		room_number = message_from_client.decode().split(' ')[1]
 		message_to_client = check_reservation(room_number)
-		send_message_to_client(message_to_client, address)
+		if (len(message_to_client) != 0):
+			send_message_to_client(message_to_client, address)
+		else:
+			error_message = "No Reservation found for this room or you may have typed wrong"
+			send_message_to_client(error_message, address)
 
 	elif message_from_client.decode().split(' ')[0] == 'delete':
 		delete_a_reservation(message_from_client, address)
