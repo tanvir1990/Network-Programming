@@ -3,7 +3,6 @@
 # 101058988
 
 # Built on Lab1
-# We will need the following module to generate randomized lost packets
 import random
 from socket import *
 import pickle
@@ -22,6 +21,7 @@ def getDays():
 	file_days.close()
 	return dict_days
 
+
 def getRooms():
 	file_rooms = open("rooms.txt", 'r')
 	dict_rooms = []
@@ -30,6 +30,7 @@ def getRooms():
 	file_rooms.close()
 	return dict_rooms
 
+
 def getTime():
 	file_time = open("timeslots.txt", 'r')
 	dict_time = []
@@ -37,6 +38,7 @@ def getTime():
 		dict_time.append(lines.strip())
 	file_time.close()
 	return dict_time
+
 
 def check_reservation(room_number):
 	file_reservation = open("reservations.txt", 'r')
@@ -47,6 +49,7 @@ def check_reservation(room_number):
 	file_reservation.close()
 	return dict_reservation
 
+
 def delete_a_reservation(delete_line):
 	with open("reservations.txt", "r") as f:
 		lines = f.readlines()
@@ -55,14 +58,6 @@ def delete_a_reservation(delete_line):
 			if line.strip("\n") != delete_line:
 				f.write(line)
 
-# def addReservation(message_from_client):
-# 	room_number = message_from_client.decode().split(' ')[1]
-# 	timeSlot = message_from_client.decode().split(' ')[2]
-# 	day = message_from_client.decode().split(' ')[3]
-# 	update_line = room_number + ' ' + timeSlot + ' ' + day
-#
-# 	with open("reservations.txt", "a") as f:
-# 		f.write(update_line + "\n")
 
 def addReservation(message_from_client, address):
 	message = message_from_client.decode()
@@ -88,14 +83,14 @@ def addReservation(message_from_client, address):
 		send_message_to_client(message_to_client, address)
 	file.close()
 
+
 def send_message_to_client(message, address):
 	serialized = pickle.dumps(message)
 	serverSocket.sendto(serialized, address)
 
-while True:
-	# Generate random number in the range of 0 to 9
 
-	# Receive the client packet along with the address it is coming from 
+while True:
+	# Receive the client packet along with the address it is coming from
 	message_from_client, address = serverSocket.recvfrom(1024)
 
 	if message_from_client.decode() == 'days':
@@ -130,7 +125,7 @@ while True:
 		addReservation(message_from_client, address)
 
 	elif message_from_client.decode().split(' ')[0] == 'quit':
-		message_to_client = "User Requested Quit. Shutting down server"
+		message_to_client = "User Requested to Quit. Shutting down server"
 		serialized = pickle.dumps(message_to_client)
 		serverSocket.sendto(serialized,  address)
 		print("User requested to Quit. Quitting Server")
