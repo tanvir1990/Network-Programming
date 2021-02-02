@@ -1,20 +1,18 @@
-# UDP_Pinger_Server.py 
+# SYSC 4502 Assignment 1
+# Tanvir Hossain
+# 101058988
 
-# We will need the following module to generate randomized lost packets 
-
-import random 
+# Built on Lab1
+# We will need the following module to generate randomized lost packets
+import random
 from socket import *
 import pickle
 
-
 # Create a UDP socket  
-# Notice the use of SOCK_DGRAM for UDP packets 
-serverSocket = socket(AF_INET, SOCK_DGRAM) 
-
-# Assign IP address and port number to socket 
-serverSocket.bind(('', 12000))
-
+serverSocket = socket(AF_INET, SOCK_DGRAM) 						# Notice the use of SOCK_DGRAM for UDP packets
+serverSocket.bind(('', 12000))									# Assign IP address and port number to socket
 print("Server is running!")
+
 
 def getDays():
 	file_days = open("days.txt", 'r')
@@ -57,9 +55,42 @@ def delete_a_reservation(delete_line):
 			if line.strip("\n") != delete_line:
 				f.write(line)
 
-def update_a_reservation(update_line):
-	with open("reservations.txt", "a") as f:
-		f.write( update_line + "\n")
+# def addReservation(message_from_client):
+# 	room_number = message_from_client.decode().split(' ')[1]
+# 	timeSlot = message_from_client.decode().split(' ')[2]
+# 	day = message_from_client.decode().split(' ')[3]
+# 	update_line = room_number + ' ' + timeSlot + ' ' + day
+#
+# 	with open("reservations.txt", "a") as f:
+# 		f.write(update_line + "\n")
+
+def addReservation(message_from_client, address):
+	message = message_from_client.decode()
+	reservation_exists = False
+	room_number = message.split(' ')[1]
+	timeSlot = message.split(' ')[2]
+	day = message.split(' ')[3]
+
+	reserve_information_from_client = room_number + ' ' + timeSlot + ' ' + day
+	file = open("reservations.txt", "r+")
+	lines = file.readlines()
+	# Check if the reservation already exists
+	for line in lines:
+		if reserve_information_from_client.strip() == line.strip():
+			reservation_exists = True
+			break
+	if reservation_exists == True:
+		message_to_client = "Error: Reservation already Exists"
+		send_message_to_client(message_to_client, address)
+	else:
+		file.write(reserve_information_from_client + "\n")
+		message_to_client = " Reservation Successful!"
+		send_message_to_client(message_to_client, address)
+	file.close()
+
+def send_message_to_client(message, address):
+	serialized = pickle.dumps(message)
+	serverSocket.sendto(serialized, address)
 
 while True:
 	# Generate random number in the range of 0 to 9
@@ -69,27 +100,22 @@ while True:
 
 	if message_from_client.decode() == 'days':
 		message_to_client = getDays()
-		serialized = pickle.dumps(message_to_client)
-		serverSocket.sendto(serialized,  address)
+		send_message_to_client(message_to_client, address)
 
-	if message_from_client.decode() == 'rooms':
+	elif message_from_client.decode() == 'rooms':
 		message_to_client = getRooms()
-		serialized = pickle.dumps(message_to_client)
-		serverSocket.sendto(serialized,  address)
+		send_message_to_client(message_to_client, address)
 
-	if message_from_client.decode() == 'timeslots':
+	elif message_from_client.decode() == 'timeslots':
 		message_to_client = getTime()
-		serialized = pickle.dumps(message_to_client)
-		serverSocket.sendto(serialized,  address)
+		send_message_to_client(message_to_client, address)
 
-	if message_from_client.decode().split(' ')[0] == 'check':
+	elif message_from_client.decode().split(' ')[0] == 'check':
 		room_number = message_from_client.decode().split(' ')[1]
 		message_to_client = check_reservation(room_number)
-		serialized = pickle.dumps(message_to_client)
-		serverSocket.sendto(serialized,  address)
+		send_message_to_client(message_to_client, address)
 
-
-	if message_from_client.decode().split(' ')[0] == 'delete':
+	elif message_from_client.decode().split(' ')[0] == 'delete':
 		room_number = message_from_client.decode().split(' ')[1]
 		timeSlot = message_from_client.decode().split(' ')[2]
 		day = message_from_client.decode().split(' ')[3]
@@ -98,24 +124,19 @@ while True:
 		delete_a_reservation(delete_line)
 
 		message_to_client = " Deleted " + message_from_client.decode()
+		send_message_to_client(message_to_client, address)
+
+	elif message_from_client.decode().split(' ')[0] == 'reserve':
+		addReservation(message_from_client, address)
+
+	elif message_from_client.decode().split(' ')[0] == 'quit':
+		message_to_client = "User Requested Quit. Shutting down server"
 		serialized = pickle.dumps(message_to_client)
 		serverSocket.sendto(serialized,  address)
-
-	if message_from_client.decode().split(' ')[0] == 'reserve':
-		room_number = message_from_client.decode().split(' ')[1]
-		timeSlot = message_from_client.decode().split(' ')[2]
-		day = message_from_client.decode().split(' ')[3]
-
-		update_line = room_number + ' ' + timeSlot + ' ' + day
-		update_a_reservation(update_line)
-
-		message_to_client = " Reservation Successful!"
-		serialized = pickle.dumps(message_to_client)
-		serverSocket.sendto(serialized,  address)
-
-	if message_from_client.decode().split(' ')[0] == 'quit':
-		message_to_client = "Quitting Server"
-		serialized = pickle.dumps(message_to_client)
-		serverSocket.sendto(serialized,  address)
-		print("User asked to Quit")
+		print("User requested to Quit. Quitting Server")
 		exit()
+
+	else:
+		message_to_client = "ERROR: Server Received Invalid command"
+		serialized = pickle.dumps(message_to_client)
+		serverSocket.sendto(serialized,  address)

@@ -23,7 +23,7 @@ for ping_seq in range(1, 2):
         message = input("Input your command: \n")
         #message = 'days'
         #message = 'rooms'
-        #message = 'check <room>'
+        #message = 'check'
         #message = 'timeslots
         #message = 'reserve GE125 9:30-10:30 Tuesday'
         #message = 'delete GE125 9:30-10:30 Tuesday'
@@ -36,7 +36,7 @@ for ping_seq in range(1, 2):
                 print(deserialized)
             except timeout:
                 print('Request Timed Out.')
-            print("Quitting Server and CLient. User Requested to Quit")
+            print("User Requested to Quit. Quitting CLient ")
             exit()
         else:
             try:
