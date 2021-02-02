@@ -1,5 +1,3 @@
-# SYSC 4502 Assignment 1
-# Tanvir Hossain, 101058988
 
 # Built on Lab1
 import random

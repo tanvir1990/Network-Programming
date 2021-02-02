@@ -1,6 +1,3 @@
-# SYSC 4502 Assignment 1
-# Tanvir Hossain, 101058988
-
 from socket import*
 import sys
 import pickle
