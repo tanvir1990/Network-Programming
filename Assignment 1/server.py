@@ -83,11 +83,10 @@ def delete_a_reservation(message_from_client, address):
 	"""deletes a reservation from the reservations.txt and then
 	sends confirmation to client
 
-	:parameter
-	requests from client
-	client address
-	:return
-	none"""
+	:param message_from_client: user request
+	:param address: client address
+	:return:
+	"""
 	# Splitting the message to extract the following information
 	room_number = message_from_client.decode().split(' ')[1]
 	timeSlot = message_from_client.decode().split(' ')[2]
@@ -138,9 +137,10 @@ def add_reservation(message_from_client, address):
 	can only be seen after the server is closed. It also depends on the oS or what application is being used to
 	read reservations.txt. Upon successful addition of reservation, it sends a confirmation to client.
 
-	:parameter
-	message from client
-	client's address"""
+	:param message_from_client: user request
+	:param address: client's address
+	:return:
+	"""
 	# Checks if the requests are valid or according the format
 	if (is_timeslots_valid(message_from_client, address) is False or
 		is_day_valid(message_from_client, address) is False or
@@ -171,10 +171,10 @@ def add_reservation(message_from_client, address):
 def send_message_to_client(message, address):
 	"""general function to handle sending operation
 
-	:parameter
-	messages by other functions
-	:return
-	client address"""
+	:param message:
+	:param address: client address
+	:return:
+	"""
 	serialized = pickle.dumps(message)
 	serverSocket.sendto(serialized, address)
 
