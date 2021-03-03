@@ -17,20 +17,35 @@ sock.settimeout(1)
 ttl = struct.pack('b', 1)
 sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
 
+
+# try:
+#
+#     # Send data to the multicast grouptesst
+#
+#     message_display_count = 1
+#     # Look for responses from all recipients
+#     # while True:
+#     #     message = input("Enter")    #this is where all client commands will go
+#     #     sent = sock.sendto(message.encode(), multicast_group)
+#     message = input("Enter")
+
+
 try:
-
-    # Send data to the multicast group
-
-
-    # Look for responses from all recipients
     while True:
-        message = input("Enter")    #this is where all client commands will go
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        ttl = struct.pack('b', 1)
+        sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
+
+        message = input("Enter")
+        # Send data to the multicast group
+        print('sending "%s"' % message)
         sent = sock.sendto(message.encode(), multicast_group)
-        while True:
 
-            print('sending "%s"' % message)
-
-            print('waiting to receive')
+        # Look for responses from all recipients
+        status = True
+        while status == True:
+            #print('waiting to receive')
             try:
                 data, server = sock.recvfrom(16)
             except socket.timeout:
@@ -38,8 +53,10 @@ try:
                 break
             else:
                 print('received "%s" from %s' % (data.decode(), server))
-                break
+                status = False
+                sock.close()
 
 finally:
     print('closing socket')
-    sock.close()
+
+

@@ -32,6 +32,7 @@ class ClientThread(threading.Thread):
         print("Start executing client thread: ", self.id)
         capitalizedSentence = data.decode().upper()
         sock.sendto(capitalizedSentence.encode(), address)
+
         print("End executing client thread: ", self.id)
 
 # Receive/respond loop
@@ -45,7 +46,7 @@ while True:
     newthread = ClientThread(data, address, thread_count)
     newthread.start()
     threads.append(newthread)
-    time.sleep(5)
+    time.sleep(3)
     newthread.stop()
 
     if newthread.is_alive():
