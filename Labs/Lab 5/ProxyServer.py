@@ -1,17 +1,23 @@
+# SYSC 4502 Lab 5
+# Tanvir Hossain 101058988
+
 from socket import *
 import sys
 import traceback
 
-# if len(sys.argv) <= 1:
-# 	print('Usage : "python ProxyServer.py server_ip"\n[server_ip : It is the IP Address Of Proxy Server')
-# 	sys.exit(2)
+if len(sys.argv) <= 1:
+	print('Usage : "python ProxyServer.py server_ip"\n[server_ip : It is the IP Address Of Proxy Server')
+	sys.exit(2)
 	
 # Create a server socket, bind it to a port and start listening
 tcpSerSock = socket(AF_INET, SOCK_STREAM)
 # Fill in start
-tcpSerPort = 8888
-#serverip = sys.argv[1]
-serverip = "127.0.0.1"
+
+serverip = sys.argv[1]
+tcpSerPort = int(sys.argv[2])
+
+#tcpSerPort = 8888
+#serverip = "127.0.0.1"
 tcpSerSock.bind((serverip, tcpSerPort))
 tcpSerSock.listen(1)
 # Fill in end
@@ -22,9 +28,9 @@ while 1:
 	tcpCliSock, addr = tcpSerSock.accept()
 	print('Received a connection from:', addr)
 	# Fill in start
-	message =  tcpCliSock.recv(1024).decode()
+	message = tcpCliSock.recv(1024).decode()
 	# Fill in end
-	print(message)
+	print (message)
 	# suppress processing of requests for favicon
 	if message.split()[1] == "/favicon.ico":
 		print("Suppress request for favicon")
@@ -45,8 +51,7 @@ while 1:
 
 		# Fill in start
 		for i in range(0, len(outputdata)):
-			tcpCliSock.send(outputdata[i])
-			print ('Read from cache')
+			tcpCliSock.send(outputdata[i].encode())
 		# Fill in end
 
 	# Error handling for file not found in cache
@@ -68,27 +73,28 @@ while 1:
 				message = "GET "+"http://" + filename + " HTTP/1.0\r\n\r\n"
 				c.send(message.encode())
 				# Read the response into buffer
-                # Fill in start
+				# Fill in start
 				resp = c.recv(1024).decode()
 				response = ""
 				while resp:
 					response += resp
 					resp = c.recv(4096).decode()
+				# if(filename[-1:] == '/'):
+				# 	filename = filename[:-1]
+				# Fill in end
 
 				# Create a new file in the cache for the requested file.
 				# Also send the response in the buffer to client socket and the corresponding file in the cache
+				tmpFile = open("./" + filetouse, "wb")
 
-				#tmpFile = open("./" + filename.replace("/","") ,"wb")
-				tmpFile = open("./" + filetouse,"wb")
 				# Fill in start
-				# if(filename[-1:] == '/'):
-				# 	filename = filename[:-1]
+
 				tmpFile.write(response.encode())
 				tmpFile.close()
-
 				tcpCliSock.send(response.encode())
 
-                # Fill in end
+				# Fill in end
+
 			except:
 				print("Illegal request")
 				traceback.print_exc()                                              
@@ -97,12 +103,11 @@ while 1:
 			# Fill in start
 			tcpCliSock.send("HTTP/1.0 404 Not Found\r\n").encode()
 			tcpCliSock.send("Content-Type:text/html\r\n").eccode()
-
-            # Fill in end
+			# Fill in end
 	
 	# Close the client and the server sockets    
 	tcpCliSock.close() 
 
 # Fill in start
-
+tcpSerSock.close()
 # Fill in end
