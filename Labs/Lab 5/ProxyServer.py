@@ -5,19 +5,19 @@ from socket import *
 import sys
 import traceback
 
-if len(sys.argv) <= 1:
-	print('Usage : "python ProxyServer.py server_ip"\n[server_ip : It is the IP Address Of Proxy Server')
-	sys.exit(2)
+# if len(sys.argv) <= 1:
+# 	print('Usage : "python ProxyServer.py server_ip"\n[server_ip : It is the IP Address Of Proxy Server')
+# 	sys.exit(2)
 	
 # Create a server socket, bind it to a port and start listening
 tcpSerSock = socket(AF_INET, SOCK_STREAM)
 # Fill in start
 
-serverip = sys.argv[1]
-tcpSerPort = int(sys.argv[2])
+# serverip = sys.argv[1]
+# tcpSerPort = int(sys.argv[2])
 
-#tcpSerPort = 8888
-#serverip = "127.0.0.1"
+tcpSerPort = 8888
+serverip = "127.0.0.1"
 tcpSerSock.bind((serverip, tcpSerPort))
 tcpSerSock.listen(1)
 # Fill in end
@@ -30,7 +30,7 @@ while 1:
 	# Fill in start
 	message = tcpCliSock.recv(1024).decode()
 	# Fill in end
-	print (message)
+	print(message)
 	# suppress processing of requests for favicon
 	if message.split()[1] == "/favicon.ico":
 		print("Suppress request for favicon")
@@ -75,10 +75,10 @@ while 1:
 				# Read the response into buffer
 				# Fill in start
 				resp = c.recv(1024).decode()
-				response = ""
-				while resp:
-					response += resp
-					resp = c.recv(4096).decode()
+				response = re
+				# while resp:
+				# 	response += resp
+				# 	resp = c.recv(4096).decode()
 				# if(filename[-1:] == '/'):
 				# 	filename = filename[:-1]
 				# Fill in end
