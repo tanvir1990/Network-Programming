@@ -1,5 +1,3 @@
-# SYSC 4502 Lab 5
-# Tanvir Hossain 101058988
 
 from socket import *
 import sys
@@ -86,7 +84,6 @@ while 1:
 				tmpFile = open("./" + filetouse, "w")
 
 				# Fill in start
-
 				tmpFile.write(html_element)
 				tmpFile.close()
 				tcpCliSock.send(response.encode())
