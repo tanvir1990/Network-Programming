@@ -5,19 +5,20 @@ from socket import *
 import sys
 import traceback
 
-# if len(sys.argv) <= 1:
-# 	print('Usage : "python ProxyServer.py server_ip"\n[server_ip : It is the IP Address Of Proxy Server')
-# 	sys.exit(2)
+if len(sys.argv) <= 1:
+	print('Usage : "python ProxyServer.py server_ip"\n[server_ip : It is the IP Address Of Proxy Server')
+	sys.exit(2)
 	
 # Create a server socket, bind it to a port and start listening
 tcpSerSock = socket(AF_INET, SOCK_STREAM)
 # Fill in start
+serverip = sys.argv[1]
+tcpSerPort = int(sys.argv[2])
 
-# serverip = sys.argv[1]
-# tcpSerPort = int(sys.argv[2])
+# The following commented values are for testing purpose. PLease ignore
+# tcpSerPort = 8888
+# serverip = "127.0.0.1"
 
-tcpSerPort = 8888
-serverip = "127.0.0.1"
 tcpSerSock.bind((serverip, tcpSerPort))
 tcpSerSock.listen(1)
 # Fill in end
@@ -70,29 +71,25 @@ while 1:
 				c.connect((hostn, 80))
 				print ('Socket connected to port 80 of the host')
 				# Fill in end
-				message = "GET "+"http://" + filename + " HTTP/1.0\r\n\r\n"
+				message = "GET "+ "http://" + filename + " HTTP/1.0\r\n\r\n"
 				c.send(message.encode())
+
 				# Read the response into buffer
 				# Fill in start
-				resp = c.recv(1024).decode()
-				response = re
-				# while resp:
-				# 	response += resp
-				# 	resp = c.recv(4096).decode()
-				# if(filename[-1:] == '/'):
-				# 	filename = filename[:-1]
+				response = c.recv(1024).decode()
+				others, html_element = response.split("Content-Type: text/html\r\n")
+
 				# Fill in end
 
 				# Create a new file in the cache for the requested file.
 				# Also send the response in the buffer to client socket and the corresponding file in the cache
-				tmpFile = open("./" + filetouse, "wb")
+				tmpFile = open("./" + filetouse, "w")
 
 				# Fill in start
 
-				tmpFile.write(response.encode())
+				tmpFile.write(html_element)
 				tmpFile.close()
 				tcpCliSock.send(response.encode())
-
 				# Fill in end
 
 			except:
@@ -102,11 +99,11 @@ while 1:
 			# HTTP response message for file not found
 			# Fill in start
 			tcpCliSock.send("HTTP/1.0 404 Not Found\r\n").encode()
-			tcpCliSock.send("Content-Type:text/html\r\n").eccode()
+			tcpCliSock.send("Content-Type:text/html\r\n").encode()
 			# Fill in end
 	
-	# Close the client and the server sockets    
-	tcpCliSock.close() 
+	# Close the client and the server sockets
+	tcpCliSock.close()
 
 # Fill in start
 tcpSerSock.close()
