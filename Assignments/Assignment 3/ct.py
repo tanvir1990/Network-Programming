@@ -1,9 +1,21 @@
 from socket import *
 import sys
 import struct
+import os
+
+def deletePid(delete_lines):
+    with open("client_pid.txt", "r") as txt:
+        lines = txt.readlines()
+    with open("client_pid.txt", "w") as txt:
+        for line in lines:
+            if line.strip("\n") != delete_lines:
+                txt.write(line)
 
 # helper functions to create messages and to split messages
-
+# file = open("tanvir_pid.txt", "w")
+# file.write(str(os.getpid()))
+# file.close()
+print("Client's PID is", os.getpid())
 def createMessage(seq, msg, pid):
     return str(seq) + " " + msg + " " + str(pid)
 
@@ -41,25 +53,32 @@ clientSocket.setsockopt(IPPROTO_IP, IP_MULTICAST_TTL, ttl)
 msg_sequence = 0
 
 while True:
-
+    file = open("client_pid.txt", "a+")
+    file.write(str(os.getpid()) + '\n')
+    file.close()
     msg_sequence += 1
-    client_pid = 123456
+    client_pid = os.getpid()
     message = createMessage(msg_sequence, input("Next command: "), client_pid)
-    
-    try:
-        clientSocket.sendto(message.encode(), (host, port))
-        reply, serverAddress = clientSocket.recvfrom(2048)
-        (seq, reply) = splitMessage(reply.decode())
-        while int(seq) < msg_sequence:
-            # print("Discard old reply")
+    command = message.split()[1]
+    if command == "quit":
+        deletePid(str(os.getpid()))
+        break
+        exit(0)
+    else:
+        try:
+            clientSocket.sendto(message.encode(), (host, port))
             reply, serverAddress = clientSocket.recvfrom(2048)
             (seq, reply) = splitMessage(reply.decode())
+            while int(seq) < msg_sequence:
+                # print("Discard old reply")
+                reply, serverAddress = clientSocket.recvfrom(2048)
+                (seq, reply) = splitMessage(reply.decode())
 
-        print(reply)
-        if reply == "bye":
-            break
-    except:
-        print("Message to server timed out, please retry")
+            print(reply)
+            if reply == "bye":
+                break
+        except:
+            print("Message to server timed out, please retry")
 
 # once we break out of the loop, close socket and terminate
 clientSocket.close()

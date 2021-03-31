@@ -5,8 +5,13 @@ import random
 import time
 import struct
 import os
+from subprocess import check_output
+from os import path
 
 # read in information one textfile, store and return as one long string
+
+
+
 def readTextfile(filename):
     result = ""
     try:
@@ -125,30 +130,114 @@ def splitMessage(input):
 
 # create Threading class - one instance per launched threat, dealing with one user command
 
-# def get_pid(name):
-#     return check_output(["pidof", name]).decode().split()
+def get_pid(name):
+    return check_output(["pidof", name]).decode().split()
 
 
+# Function that checks if a server is leader
+
+
+def parsing():
+    file = open("All_pids.txt", "w")
+    tasklist = check_output("tasklist | findstr python.exe", shell=True).decode()
+    file.write(tasklist)
+    file.close()
+
+    # Previous Gives empty line after each line
+    # So the following operation gets rid of the new empty lines
+    with open('All_pids.txt') as infile, open('All_pids_cleaned.txt', 'w') as outfile:
+        for line in infile:
+            if not line.strip():
+                continue  # skip the empty line
+            outfile.write(line)  # non-empty line. Write it to output
+    infile.close()
+    outfile.close()
+
+    # remove server_pid.txt
+    # if path.exists("All_pids.txt"):
+    #     os.remove('All_pids.txt')
+
+
+    file = open("All_pids_cleaned.txt", "r+")
+    tasklist_lines = file.readlines()
+    All_pids = []
+    for line in tasklist_lines:
+        if line is not []:
+            a,server_pid,c,d,e,f = line.split()
+            All_pids.append(int(server_pid))
+    file.close()
+
+    # if path.exists("All_pids_cleaned.txt"):
+    #     os.remove('All_pids_cleaned.txt')
+
+    print("All PIDs", All_pids)
+    # Find the highest of the PIDs
+
+    # read from client_pid.txt, tanvir_pid is client PID
+    file = open("client_pid.txt", "r+")
+    client_pid_lines = file.readlines()
+    for client_pid in client_pid_lines:
+        if int(client_pid.strip()) in All_pids:
+            All_pids.remove(int(client_pid.strip()))
+
+    file.close()
+    only_server_pids = All_pids
+
+    print("After removing the client Pids", only_server_pids)
+
+    #
+    file = open("highest_server_pid.txt", "w")
+    highest_server_pid = max(only_server_pids)
+    # if os.getpid() != highest_server_pid:
+    file.write(str(highest_server_pid))
+    file.close()
+
+
+
+def isLeader():
+    max_pid = readTextfile("highest_server_pid.txt")
+    print ("Max_pid", max_pid)
+
+    if os.getpid() == int(max_pid.strip()):
+        print("I AM THE LEADER")
+        return True
+    else:
+        return False
+
+
+
+
+threadLock = threading.Lock()
 class ClientCmdThread(threading.Thread):
+
     def __init__(self, ip, port, msg):
         threading.Thread.__init__(self)
         self.ip = ip
         self.port = port
 
+        # Message also contains Client's PID, just in case
         message = msg.decode()
-        print(message.split())
         (self.sequence_number, self.msg, client_pid) = message.split()
 
-    def run(self):
-        print("Start executing thread for:", self.msg, "with sequence number", self.sequence_number)
-        answer = createMessage(self.sequence_number,processCommand(self.msg))
-        serverSocket.sendto(answer.encode(), (self.ip, self.port))
-	# Generate random number in the range of 2 to 4 and sleep
-        rand = random.randint(5, 10)   
-        time.sleep(rand)
-        print("End executing thread for:", self.msg)
 
-        print("The PID for thread ", self.sequence_number, " is", os.getpid())
+    def run(self):
+        print("The Server Process ID ", os.getpid())
+        parsing()
+        print("Start executing thread for:", self.msg, "with sequence number", self.sequence_number)
+        answer = createMessage(self.sequence_number, processCommand(self.msg))
+        process_Id = os.getpid()
+        #threadLock.acquire()
+        result = isLeader()
+        if result == True:
+            print("Server with Process Id", os.getpid(), " is the Leader")
+            serverSocket.sendto(answer.encode(), (self.ip, self.port))
+	        # Generate random number in the range of 2 to 4 and sleep
+            rand = random.randint(5, 10)
+            time.sleep(rand)
+            print("End executing thread for:", self.msg)
+        else:
+            print("Server Process", os.getpid(), "IS NOT THE LEADER. SO IT's NOT SENDING ANY REPLY TO CLIENT. ")
+        #threadLock.release()
 
 
 # Get the multicast group address and server port as command line arguments and set up the server socket
